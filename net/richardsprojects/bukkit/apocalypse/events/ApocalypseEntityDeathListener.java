@@ -3,7 +3,7 @@ package net.richardsprojects.bukkit.apocalypse.events;
 import java.util.Random;
 
 import net.richardsprojects.bukkit.apocalypse.Apocalypse;
-import net.richardsprojects.bukkit.apocalypse.ZombieGame;
+import net.richardsprojects.bukkit.apocalypse.ApocalypsePlayer;
 import net.richardsprojects.bukkit.apocalypse.gui.Notification;
 
 import org.bukkit.entity.LivingEntity;
@@ -16,7 +16,6 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 
 public class ApocalypseEntityDeathListener implements Listener{
 	
-	protected ZombieGame game;
 	private Apocalypse plugin;
 	
 	public ApocalypseEntityDeathListener(Apocalypse plugin) {
@@ -31,12 +30,12 @@ public class ApocalypseEntityDeathListener implements Listener{
 			int xpCalculator = rangen.nextInt(2);
 			int xpValue = 0;
 		  
-			game = new ZombieGame();
-
 			Player killer = (Player)event.getEntity().getKiller();
 			SpoutPlayer splayer = (SpoutPlayer) killer;
-		      
-			game.addKill(killer.getName());
+		    
+			ApocalypsePlayer apocPlayer = new ApocalypsePlayer(killer);
+			
+			apocPlayer.addKill();
 		     
 			event.setDroppedExp(0);
 		     
@@ -51,8 +50,8 @@ public class ApocalypseEntityDeathListener implements Listener{
 			notification.display();
 			
 			
-			game.setXP(killer.getName(), game.getXP(killer.getName()) + xpValue);
-			game.updatePlayerUI(plugin, killer);
+			apocPlayer.setXP(apocPlayer.getXP() + xpValue);
+			apocPlayer.updatePlayerUI(plugin);
 		}
 	}
 }

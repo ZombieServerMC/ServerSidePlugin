@@ -1,7 +1,7 @@
 package net.richardsprojects.bukkit.apocalypse.commands;
 
 import net.richardsprojects.bukkit.apocalypse.Apocalypse;
-import net.richardsprojects.bukkit.apocalypse.ZombieGame;
+import net.richardsprojects.bukkit.apocalypse.ApocalypsePlayer;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,9 +10,6 @@ import org.bukkit.entity.Player;
 
 public class StatsCommand implements CommandExecutor{
 
-	protected ZombieGame game;
-	
-	@SuppressWarnings("unused")
 	private Apocalypse plugin;
 	public StatsCommand(Apocalypse plugin) {
 		this.plugin = plugin;
@@ -23,10 +20,11 @@ public class StatsCommand implements CommandExecutor{
 			sender.sendMessage("This command can not be used from the console.");
 			return true;
 		}
-		game = new ZombieGame();
 		
-		int totalKills = game.totalKills(sender.getName());
-		int totalDeaths = game.totalDeaths(sender.getName());
+		ApocalypsePlayer apocPlayer = new ApocalypsePlayer((Player) sender);
+		
+		int totalKills = apocPlayer.totalKills();
+		int totalDeaths = apocPlayer.totalDeaths();
 		
 		sender.sendMessage(sender.getName() + " Stats:");
 		sender.sendMessage("Total Kills: " + totalKills);

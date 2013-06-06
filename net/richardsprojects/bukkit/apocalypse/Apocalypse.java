@@ -1,10 +1,5 @@
 package net.richardsprojects.bukkit.apocalypse;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 import net.richardsprojects.bukkit.apocalypse.Apocalypse;
 import net.richardsprojects.bukkit.apocalypse.commands.CreditsCommand;
 import net.richardsprojects.bukkit.apocalypse.commands.StartCommand;
@@ -27,28 +22,26 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class Apocalypse extends JavaPlugin {
 	
 	public Apocalypse apocPlugin;
-	
 	public Logger logger = Logger.getLogger ("Minecraft");
-	
-	public Map<String, Long> PlayerStartMilliseconds = new HashMap<String, Long>();
-	public Map<String, Long> PlayerLastMilliseconds = new HashMap<String, Long>();
-	
-	public Map<String, Long> PlayerThirst = new HashMap<String, Long>();
-	public Map<String, Long> PlayerSeconds = new HashMap<String, Long>();
-	public Map<String, Long> PlayerMinutes = new HashMap<String, Long>();
-	public Map<String, Long> PlayerHours = new HashMap<String, Long>();
 	protected Apocalypse Apoc;
 	protected ThirstController thirst;
-	protected ZombieGame game;
 	
+	static //Hashmap to store if UI has already been loaded
+	HashMap<String, Boolean> uiActive = new HashMap<String, Boolean>();
+		
 	public String pluginFolder() {
 		return this.getDataFolder().getAbsolutePath();
 	}
@@ -59,9 +52,11 @@ public class Apocalypse extends JavaPlugin {
 		PluginManager manager = this.getServer().getPluginManager();
 		apocPlugin = this;
 		
+		//Register Events
+		
 		manager.registerEvents(new ApocalypseBlockEventListener(), this);
 		manager.registerEvents(new ApocalypsePlayerQuitListener(this), this);
-		//manager.registerEvents(new PlayerJoinListener(this), this);
+		manager.registerEvents(new PlayerJoinListener(this), this);
 		manager.registerEvents(new ApocalypseEntityDeathListener(this), this);
 		manager.registerEvents(new ApocalypsePlayerListener(this), this);
 		manager.registerEvents(new ApocalypseEntityRegainHealth(), this);
@@ -71,23 +66,27 @@ public class Apocalypse extends JavaPlugin {
 		manager.registerEvents(new ApocalypseOnRespawn(), this);
 		manager.registerEvents(new ApocalypseSpoutListener(this), this);
 		
-		
+		//Register Commands
 		this.getCommand("start").setExecutor(new StartCommand(this));
 		this.getCommand("timealive").setExecutor(new TimeAliveCommand(this));
 		this.getCommand("credits").setExecutor(new CreditsCommand(this));
 		this.getCommand("stats").setExecutor(new StatsCommand(this));
 		
+		//Initialize Classes
 		thirst = new ThirstController();
-		game = new ZombieGame();
-		
+	
 		
 		logger.info("[Apocalypse] Thirst is enabled.");
+		
 		Apoc = new Apocalypse();
+		
+		//Schedule task to reduce thirst
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
 				Player[] players = getServer().getOnlinePlayers();
 				for (Player player : players) {
-					if (player.getGameMode() == GameMode.SURVIVAL && game.getPlaying(player.getName()) == true) {
+					ApocalypsePlayer apocPlayer = new ApocalypsePlayer(player);
+					if (player.getGameMode() == GameMode.SURVIVAL && apocPlayer.getPlaying() == true) {
 						if (thirst.Load(player.getPlayer().getName()) == 21 || thirst.Load(player.getPlayer().getName()) == 22) {
 							player.getPlayer().sendMessage("Error!");							
 						}else{
@@ -109,35 +108,42 @@ public class Apocalypse extends JavaPlugin {
 			}
 		}, 900, 900);
 		
+		//Schedule task to update player UI's when they first login
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
-				Player[] players = getServer().getOnlinePlayers();
+				
+				Player[] players = getServer().getOnlinePlayers();				
 				for (Player player : players) {
-					game.updatePlayerUI(apocPlugin, player);
+					ApocalypsePlayer apocPlayer = new ApocalypsePlayer(player);
+					if(Apocalypse.uiActive.get(player.getName()) != null) {
+						
+					}else{
+						apocPlayer.updatePlayerUI(apocPlugin);
+						player.sendMessage("DEBUG");
+					}
 				}
 			}
 		}, 1, 1);
 		
-		//Damage players who have are dehydrated.
-			
-			getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-				public void run() {
-					Player[] players = getServer().getOnlinePlayers();
-					for (Player player : players) {
-							if (thirst.Load(player.getPlayer().getName()) == 0) {
-								player.damage(1);
-							}
-					}
+		//Damage players who have are dehydrated.			
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			public void run() {
+				Player[] players = getServer().getOnlinePlayers();
+				for (Player player : players) {
+						if (thirst.Load(player.getPlayer().getName()) == 0) {
+							player.damage(1);
+						}
 				}
-			}, 40L, 20);
+			}
+		}, 40L, 20);
 
-			
-			List<Entity> entities = getServer().getWorld("world").getEntities();
-			for (Entity zombie : entities) {
-				if (zombie instanceof Zombie) {
-				}else{
-					zombie.remove();
-				}
+		//Remove any mobs in the world that are not Zombies	
+		List<Entity> entities = getServer().getWorld("world").getEntities();
+		for (Entity zombie : entities) {
+			if (zombie instanceof Zombie) {
+			}else{
+				zombie.remove();
+			}
 			}
 
 		return;

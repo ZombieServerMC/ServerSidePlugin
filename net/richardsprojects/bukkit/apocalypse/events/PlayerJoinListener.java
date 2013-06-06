@@ -2,7 +2,6 @@ package net.richardsprojects.bukkit.apocalypse.events;
 
 
 import net.richardsprojects.bukkit.apocalypse.Apocalypse;
-import net.richardsprojects.bukkit.apocalypse.ZombieGame;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,7 +12,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener{
 	
-	protected ZombieGame game;
 	private Apocalypse plugin;
 
 	public PlayerJoinListener(Apocalypse plugin) {
@@ -22,9 +20,6 @@ public class PlayerJoinListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onEventJoin(PlayerJoinEvent event) {
-	    Player player = (Player) event.getPlayer();
-
-		game.updatePlayerUI(plugin, player);
 	}
 }
 

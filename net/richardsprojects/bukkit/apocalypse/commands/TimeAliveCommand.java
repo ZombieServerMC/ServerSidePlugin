@@ -29,11 +29,12 @@ public class TimeAliveCommand implements CommandExecutor{
 			sender.sendMessage("Sorry this command can not be used from the console.");
 			return true;
 		}
-		Apoc = new Apocalypse();
 		
-	    Player player = (Player) sender;
-		
-	    if(plugin.PlayerStartMilliseconds.containsKey(player.getName())){
+		//Old System for implementing Time Alive - new one will be implemented soon
+		//Apoc = new Apocalypse();
+		//Player player = (Player) sender;
+	    		
+	    /*if(plugin.PlayerStartMilliseconds.containsKey(player.getName())){
 	    long FirstDate = plugin.PlayerStartMilliseconds.get(player.getName());
 		long difference = System.currentTimeMillis() - FirstDate;
 		long difference_in_seconds = difference / 1000;
@@ -49,7 +50,7 @@ public class TimeAliveCommand implements CommandExecutor{
 			
 	
 		}else{sender.sendMessage("You have not started playing yet!");}	
-	
+		*/
 	    
 
 		return true;

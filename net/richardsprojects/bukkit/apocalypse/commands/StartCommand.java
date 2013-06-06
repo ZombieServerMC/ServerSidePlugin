@@ -6,8 +6,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import net.richardsprojects.bukkit.apocalypse.Apocalypse;
+import net.richardsprojects.bukkit.apocalypse.ApocalypsePlayer;
 import net.richardsprojects.bukkit.apocalypse.ThirstController;
-import net.richardsprojects.bukkit.apocalypse.ZombieGame;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -25,7 +25,6 @@ public class StartCommand implements CommandExecutor{
 	private Apocalypse plugin;
 	
 	protected ThirstController thirst;
-	protected ZombieGame game;	
 	protected Apocalypse Apoc;
 	
 	
@@ -40,7 +39,6 @@ public class StartCommand implements CommandExecutor{
 			return true;
 		}
 		Apoc = new Apocalypse();
-		game = new ZombieGame();
 		thirst = new ThirstController();
 		
 	    PlayerInventory inventory = ((Player) sender).getPlayer().getInventory();
@@ -77,8 +75,9 @@ public class StartCommand implements CommandExecutor{
 	    inventory.addItem(myItem2);
 		
 	    Player player = (Player) sender;
+	    ApocalypsePlayer apocPlayer = new ApocalypsePlayer(player);
 	    
-	    game.setPlaying(player.getName(), 1);
+	    apocPlayer.setPlaying(1);
 	    
 	    player.getPlayer().setLevel(0);
 	    player.getPlayer().setExp(1);
@@ -112,14 +111,14 @@ public class StartCommand implements CommandExecutor{
 		}
 	    	
 	    
-
+	    /* Old System for keeping track of time alive - new one will be implemented soon
 	    plugin.PlayerStartMilliseconds.put(player.getName(), System.currentTimeMillis());
 	    plugin.PlayerSeconds.put(player.getName(), (long) 0);
 	    plugin.PlayerMinutes.put(player.getName(), (long) 0);
 	    plugin.PlayerHours.put(player.getName(), (long) 0);
 	    
 	    plugin.PlayerThirst.put(player.getName(), (long) 20);
-	    
+	    */
    
 	    World world = ((Player) sender).getServer().getWorld("world");
 	    Location location = new Location(world, -72.27133342697881, 64.62, 184.36104621401566);

@@ -19,19 +19,8 @@ public class ApocalypsePlayerQuitListener implements Listener {
 
 	
 	public void onEventQuit(PlayerQuitEvent event) {
-	    Player player = (Player) event.getPlayer();
-	    if(plugin.PlayerStartMilliseconds.containsKey(player.getName())){
-		    long FirstDate = plugin.PlayerStartMilliseconds.get(player.getName());
-			long difference = System.currentTimeMillis() - FirstDate;
-			long difference_in_seconds = difference / 1000;
-			plugin.PlayerStartMilliseconds.put(player.getName(), System.currentTimeMillis());
-			
-			long seconds = plugin.PlayerSeconds.get(player.getName());
-			seconds = seconds + difference_in_seconds;
-			plugin.PlayerSeconds.put(player.getName(), seconds);
-		    }
+		
+	}
 
-		}
-
-	}	
+}	
 
